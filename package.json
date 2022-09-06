@@ -2,6 +2,11 @@
   "name": "@cubux/effector-persistent",
   "version": "0.1.0",
   "description": "Persist data in effector store.",
+  "keywords": [
+    "effector",
+    "store",
+    "persistent"
+  ],
   "author": {
     "name": "Vovan-VE",
     "email": "vovan-ve@yandex.ru"
