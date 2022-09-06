@@ -1,0 +1,86 @@
+{
+  "name": "@cubux/effector-persistent",
+  "version": "0.1.0",
+  "description": "Persist data in effector store.",
+  "author": {
+    "name": "Vovan-VE",
+    "email": "vovan-ve@yandex.ru"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cubux-net/effector-persistent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cubux-net/effector-persistent/issues"
+  },
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/effector-persistent.esm.js",
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "build": "dts build",
+    "start": "dts watch",
+    "prepare": "dts build",
+    "test": "tsc --noEmit && dts test --passWithNoTests",
+    "test:watch": "npm test -- --watch",
+    "test:coverage": "npm test -- --coverage",
+    "analyze": "size-limit --why",
+    "lint": "dts lint",
+    "size": "size-limit"
+  },
+  "peerDependencies": {
+    "@cubux/storage-driver": "^0.1.0",
+    "effector": ">=19",
+    "typescript": "^4"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@cubux/storage-driver": "^0.1.0",
+    "@size-limit/preset-small-lib": "^8.0.0",
+    "@tsconfig/recommended": "^1.0.1",
+    "dts-cli": "^1.6.0",
+    "effector": "~19.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "size-limit": "^8.0.0",
+    "tslib": "^2.4.0",
+    "typescript": "~4.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json}": [
+      "prettier --write"
+    ]
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "size-limit": [
+    {
+      "path": "dist/effector-persistent.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/effector-persistent.esm.js",
+      "limit": "10 KB"
+    }
+  ]
+}
