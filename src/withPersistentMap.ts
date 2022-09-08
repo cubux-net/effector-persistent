@@ -42,7 +42,7 @@ export function withPersistentMap<
   driver:
     | StoreDriverMapped<Key, Serialized>
     | Promise<StoreDriverMapped<Key, Serialized>>,
-  options?: WithPersistentOptions<Value, Serialized>
+  options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
 ): TStore {
   const { serialize, unserialize } = options || {};
   initialize<

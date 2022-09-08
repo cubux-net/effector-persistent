@@ -1,8 +1,9 @@
-import { createEvent, Store } from 'effector';
+import { createEvent, is, Store } from 'effector';
 import { addFlush } from './addFlush';
 import { WithPersistentOptions } from '../types';
 
 const noop = (v: any) => v;
+const isStore = <S, U>(unit: Store<S> | U): unit is Store<S> => is.store(unit);
 
 export function initialize<Driver, Value, Serialized = Value>(
   driver: Driver | Promise<Driver>,
@@ -11,7 +12,8 @@ export function initialize<Driver, Value, Serialized = Value>(
     flushDelay,
     serialize = noop,
     unserialize = noop,
-  }: WithPersistentOptions<Value, Serialized> = {},
+    wakeUp = store,
+  }: WithPersistentOptions<Value, Value, Serialized> = {},
   read: (driver: Driver) => Promise<Serialized | undefined>,
   write: (driver: Driver, value: Serialized) => Promise<void>
 ) {
@@ -20,11 +22,13 @@ export function initialize<Driver, Value, Serialized = Value>(
       (s) => {
         if (s !== undefined) {
           return Promise.resolve(unserialize(s)).then(
-            (v) => {
-              const init = createEvent<Value>();
-              store.on(init, (_, v) => v);
-              init(v);
-            },
+            isStore(wakeUp)
+              ? (v) => {
+                  const init = createEvent<Value>();
+                  wakeUp.on(init, (_, v) => v);
+                  init(v);
+                }
+              : wakeUp,
             (e) =>
               console.error(
                 'Failed to unserialize output from persistent driver',

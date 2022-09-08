@@ -22,7 +22,7 @@ export function withPersistent<
     | StoreDriverSingle<Key, Serialized>
     | Promise<StoreDriverSingle<Key, Serialized>>,
   key: Key,
-  options?: WithPersistentOptions<Value, Serialized>
+  options?: WithPersistentOptions<Value, Value, Serialized>
 ): TStore {
   initialize(
     driver,

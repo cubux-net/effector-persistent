@@ -43,7 +43,7 @@ function withPersistent<
   driver:   StoreDriverSingle<Key, Serialized>
           | Promise<StoreDriverSingle<Key, Serialized>>,
   key:      Key,
-  options?: WithPersistentOptions<Value, Serialized>
+  options?: WithPersistentOptions<Value, Value, Serialized>
 ): TStore
 ```
 
@@ -81,7 +81,7 @@ function withPersistentMap<
   store:    TStore,
   driver:   StoreDriverMapped<Key, Serialized>
           | Promise<StoreDriverMapped<Key, Serialized>>,
-  options?: WithPersistentOptions<Value, Serialized>
+  options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
 ): TStore
 ```
 
@@ -111,7 +111,8 @@ Common options for persistent storage.
 
 ```ts
 interface WithPersistentOptions<
-  Value = any,
+  State = any,
+  Value = State,
   Serialized = Value
 >
 ```
@@ -119,5 +120,6 @@ interface WithPersistentOptions<
 | Options       | Type                                                                          | Default     | Description                                                                                                                                                                       |
 |---------------|-------------------------------------------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `flushDelay`  | <code>number &#124; undefined</code>                                          | `undefined` | Debounce subsequent store updates and flush only after latest change. If set to `undefined` (default), no debounce will be used, so every store update will be flushed to driver. |
+| `wakeUp`      | <code>Store&lt;State&gt; &#124; ((state: State) =&gt; void)</code>            | `undefined` | Alternative target which will receive initial state read from driver on initialization. When `undefined`, the source Store will be used.                                          |
 | `serialize`   | <code>(input: Value) =&gt; Serialized &#124; Promise&lt;Serialized&gt;</code> | `undefined` | Serialization before writing data to driver.                                                                                                                                      |
 | `unserialize` | <code>(output: Serialized) =&gt; Value &#124; Promise&lt;Value&gt;</code>     | `undefined` | Unserialization after reading data from driver.                                                                                                                                   |
