@@ -33,12 +33,18 @@ Data from `store` will be stored in `driver` with the given `key`. Function
 returns input `store`, so it can be used inline.
 
 ```ts
-function withPersistent<K, V, S extends Store<V>>(
-  store:    S,
-  driver:   StoreDriverSingle<K, V> | Promise<StoreDriverSingle<K, V>>,
-  key:      K,
-  options?: WithPersistentOptions
-): S
+function withPersistent<
+  Key,
+  Value,
+  TStore extends Store<Value> = Store<Value>,
+  Serialized = Value
+>(
+  store:    TStore,
+  driver:   StoreDriverSingle<Key, Serialized>
+          | Promise<StoreDriverSingle<Key, Serialized>>,
+  key:      Key,
+  options?: WithPersistentOptions<Value, Serialized>
+): TStore
 ```
 
 Example:
@@ -65,12 +71,22 @@ keys from `ReadonlyMap`. Function returns input `store`, so it can be used
 inline.
 
 ```ts
-function withPersistentMap<K, V, S extends Store<ReadonlyMap<K, V>>>(
-  store:    S,
-  driver:   StoreDriverMapped<K, V> | Promise<StoreDriverMapped<K, V>>,
-  options?: WithPersistentOptions
-): S
+function withPersistentMap<
+  Key,
+  Value,
+  TStore extends Store<ReadonlyMap<Key, Value>>
+    = Store<ReadonlyMap<Key, Value>>,
+  Serialized = Value
+>(
+  store:    TStore,
+  driver:   StoreDriverMapped<Key, Serialized>
+          | Promise<StoreDriverMapped<Key, Serialized>>,
+  options?: WithPersistentOptions<Value, Serialized>
+): TStore
 ```
+
+**Notice:** Serialization when used with `options` will be applied to individual
+values `Value` rather than to whole `Map<Key, Value>`.
 
 Example:
 
@@ -93,6 +109,15 @@ have its own row in `localStorage`.
 
 Common options for persistent storage.
 
-| Options      | Type                                 | Default     | Description                                                                                                                                                                       |
-|--------------|--------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `flushDelay` | <code>number &#124; undefined</code> | `undefined` | Debounce subsequent store updates and flush only after latest change. If set to `undefined` (default), no debounce will be used, so every store update will be flushed to driver. |
+```ts
+interface WithPersistentOptions<
+  Value = any,
+  Serialized = Value
+>
+```
+
+| Options       | Type                                                                          | Default     | Description                                                                                                                                                                       |
+|---------------|-------------------------------------------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `flushDelay`  | <code>number &#124; undefined</code>                                          | `undefined` | Debounce subsequent store updates and flush only after latest change. If set to `undefined` (default), no debounce will be used, so every store update will be flushed to driver. |
+| `serialize`   | <code>(input: Value) =&gt; Serialized &#124; Promise&lt;Serialized&gt;</code> | `undefined` | Serialization before writing data to driver.                                                                                                                                      |
+| `unserialize` | <code>(output: Serialized) =&gt; Value &#124; Promise&lt;Value&gt;</code>     | `undefined` | Unserialization after reading data from driver.                                                                                                                                   |

@@ -11,12 +11,19 @@ import { WithPersistentOptions } from './types';
  * @param options Other options
  * @return Input store
  */
-export function withPersistent<K, V, S extends Store<V> = Store<V>>(
-  store: S,
-  driver: StoreDriverSingle<K, V> | Promise<StoreDriverSingle<K, V>>,
-  key: K,
-  options?: WithPersistentOptions
-): S {
+export function withPersistent<
+  Key,
+  Value,
+  TStore extends Store<Value> = Store<Value>,
+  Serialized = Value
+>(
+  store: TStore,
+  driver:
+    | StoreDriverSingle<Key, Serialized>
+    | Promise<StoreDriverSingle<Key, Serialized>>,
+  key: Key,
+  options?: WithPersistentOptions<Value, Serialized>
+): TStore {
   initialize(
     driver,
     store,

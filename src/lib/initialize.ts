@@ -2,31 +2,52 @@ import { createEvent, Store } from 'effector';
 import { addFlush } from './addFlush';
 import { WithPersistentOptions } from '../types';
 
-export function initialize<D, V>(
-  driver: D | Promise<D>,
-  store: Store<V>,
-  { flushDelay }: WithPersistentOptions = {},
-  read: (driver: D) => Promise<V | undefined>,
-  write: (driver: D, value: V) => Promise<void>
+const noop = (v: any) => v;
+
+export function initialize<Driver, Value, Serialized = Value>(
+  driver: Driver | Promise<Driver>,
+  store: Store<Value>,
+  {
+    flushDelay,
+    serialize = noop,
+    unserialize = noop,
+  }: WithPersistentOptions<Value, Serialized> = {},
+  read: (driver: Driver) => Promise<Serialized | undefined>,
+  write: (driver: Driver, value: Serialized) => Promise<void>
 ) {
-  function setup(driver: D) {
+  function setup(driver: Driver) {
     read(driver).then(
       (s) => {
         if (s !== undefined) {
-          const init = createEvent<V>();
-          store.on(init, (_, s) => s);
-          init(s);
+          return Promise.resolve(unserialize(s)).then(
+            (v) => {
+              const init = createEvent<Value>();
+              store.on(init, (_, v) => v);
+              init(v);
+            },
+            (e) =>
+              console.error(
+                'Failed to unserialize output from persistent driver',
+                e
+              )
+          );
         }
       },
-      (e) => {
-        console.error('Failed to read value from persistent driver', e);
-      }
+      (e) => console.error('Failed to read value from persistent driver', e)
     );
 
-    addFlush(store, flushDelay, (s) => {
-      write(driver, s).catch((e) => {
-        console.error('Failed to write data to persistent driver', e);
-      });
+    addFlush(store, flushDelay, (v) => {
+      Promise.resolve(serialize(v)).then(
+        (s) =>
+          write(driver, s).catch((e) =>
+            console.error('Failed to write data to persistent driver', e)
+          ),
+        (e) =>
+          console.error(
+            'Failed to serialize input before write to persistent driver',
+            e
+          )
+      );
     });
   }
 
