@@ -30,20 +30,56 @@ const buildMapMapper = <V, U>(mapper?: (value: V) => U | Promise<U>) =>
  * @param options Other options
  * @return Input store
  */
-export function withPersistentMap<
+interface WithPersistentMapFn {
+  /**
+   * Register persistent data handling for the given store with the given driver.
+   * @param store Store to work with
+   * @param driver Persistent storage driver
+   * @param options Other options
+   * @return Input store
+   */
+  <Key, Value, Serialized>(
+    store: Store<ReadonlyMap<Key, Value>>,
+    driver:
+      | StoreDriverMapped<Key, Serialized>
+      | Promise<StoreDriverMapped<Key, Serialized>>,
+    options: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
+  ): typeof store;
+
+  /**
+   * Register persistent data handling for the given store with the given driver.
+   * @param store Store to work with
+   * @param driver Persistent storage driver
+   * @param options Other options
+   * @return Input store
+   */
+  <Key, Value>(
+    store: Store<ReadonlyMap<Key, Value>>,
+    driver:
+      | StoreDriverMapped<Key, Value>
+      | Promise<StoreDriverMapped<Key, Value>>,
+    options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Value>
+  ): typeof store;
+}
+
+/**
+ * Register persistent data handling for the given store with the given driver.
+ * @param store Store to work with
+ * @param driver Persistent storage driver
+ * @param options Other options
+ * @return Input store
+ */
+export const withPersistentMap: WithPersistentMapFn = <
   Key,
   Value,
-  TStore extends Store<ReadonlyMap<Key, Value>> = Store<
-    ReadonlyMap<Key, Value>
-  >,
   Serialized = Value
 >(
-  store: TStore,
+  store: Store<ReadonlyMap<Key, Value>>,
   driver:
     | StoreDriverMapped<Key, Serialized>
     | Promise<StoreDriverMapped<Key, Serialized>>,
   options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
-): TStore {
+): typeof store => {
   const { serialize, unserialize } = options || {};
   initialize<
     StoreDriverMapped<Key, Serialized>,
@@ -62,4 +98,4 @@ export function withPersistentMap<
   );
 
   return store;
-}
+};

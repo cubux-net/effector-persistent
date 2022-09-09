@@ -33,18 +33,13 @@ Data from `store` will be stored in `driver` with the given `key`. Function
 returns input `store`, so it can be used inline.
 
 ```ts
-function withPersistent<
-  Key,
-  Value,
-  TStore extends Store<Value> = Store<Value>,
-  Serialized = Value
->(
-  store:    TStore,
+function withPersistent<Key, Value, Serialized = Value>(
+  store:    Store<Value>,
   driver:   StoreDriverSingle<Key, Serialized>
           | Promise<StoreDriverSingle<Key, Serialized>>,
   key:      Key,
   options?: WithPersistentOptions<Value, Value, Serialized>
-): TStore
+): typeof store
 ```
 
 Example:
@@ -71,18 +66,12 @@ keys from `ReadonlyMap`. Function returns input `store`, so it can be used
 inline.
 
 ```ts
-function withPersistentMap<
-  Key,
-  Value,
-  TStore extends Store<ReadonlyMap<Key, Value>>
-    = Store<ReadonlyMap<Key, Value>>,
-  Serialized = Value
->(
-  store:    TStore,
+function withPersistentMap<Key, Value, Serialized = Value>(
+  store:    Store<ReadonlyMap<Key, Value>>,
   driver:   StoreDriverMapped<Key, Serialized>
           | Promise<StoreDriverMapped<Key, Serialized>>,
   options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
-): TStore
+): typeof store
 ```
 
 **Notice:** Serialization when used with `options` will be applied to individual
