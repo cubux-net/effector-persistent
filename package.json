@@ -1,6 +1,6 @@
 {
   "name": "@cubux/effector-persistent",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Persist data in effector store.",
   "keywords": [
     "effector",
@@ -43,7 +43,7 @@
     "size": "size-limit"
   },
   "peerDependencies": {
-    "@cubux/storage-driver": "^0.1.0",
+    "@cubux/storage-driver": "^0.1 || ^0.2 || ^0.3",
     "effector": ">=19",
     "typescript": "^4"
   },
