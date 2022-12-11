@@ -4,7 +4,11 @@
 
 - **BREAKING**: Bump `effector` in `peerDependencies` to `~20.4.0 || >=21` for
   `guard()`.
+- May be **BREAKING**: Prevent unnecessary writing to Driver when it's triggered
+  on "wake up" phase.
 - Add: Option `readOnly` of type `Store<boolean>` to disable writes to storage.
+- Add: Options `onFlushStart`, `onFlushDone`, `onFlushFail` and `onFlushFinally`
+  to track flushes into Driver.
 
 ## 0.2.0 (2022-09-10)
 

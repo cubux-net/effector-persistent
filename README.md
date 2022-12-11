@@ -94,6 +94,25 @@ In the example above `$storeMap` will use `localStorage` for persistent data
 with keys starting with `"persistent:"`, so every entry from `ReadonlyMap` will
 have its own row in `localStorage`.
 
+### `interface WithPersistentFlushEvent`
+
+A payload for flush events.
+
+| Property | Type     | Description                       |
+|----------|----------|-----------------------------------|
+| `id`     | `symbol` | Identifier for current flush flow |
+
+### `interface WithPersistentFlushFailEvent`
+
+A payload for flush events.
+
+This interface extends `WithPersistentFlushEvent` with the following additional
+properties:
+
+| Property | Type      | Description           |
+|----------|-----------|-----------------------|
+| `error`  | `unknown` | Reason of the failure |
+
 ### `interface WithPersistentOptions`
 
 Common options for persistent storage.
@@ -106,9 +125,14 @@ interface WithPersistentOptions<
 >
 ```
 
-| Options       | Type                                                                          | Default     | Description                                                                                                                                                                       |
-|---------------|-------------------------------------------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `flushDelay`  | <code>number &#124; undefined</code>                                          | `undefined` | Debounce subsequent store updates and flush only after latest change. If set to `undefined` (default), no debounce will be used, so every store update will be flushed to driver. |
-| `wakeUp`      | <code>Store&lt;State&gt; &#124; ((state: State) =&gt; void)</code>            | `undefined` | Alternative target which will receive initial state read from driver on initialization. When `undefined`, the source Store will be used.                                          |
-| `serialize`   | <code>(input: Value) =&gt; Serialized &#124; Promise&lt;Serialized&gt;</code> | `undefined` | Serialization before writing data to driver.                                                                                                                                      |
-| `unserialize` | <code>(output: Serialized) =&gt; Value &#124; Promise&lt;Value&gt;</code>     | `undefined` | Unserialization after reading data from driver.                                                                                                                                   |
+| Options          | Type                                                                          | Default     | Description                                                                                                                                                                                      |
+|------------------|-------------------------------------------------------------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `flushDelay`     | `number`                                                                      | `undefined` | Debounce subsequent store updates and flush only after latest change. If set to `undefined` (default), no debounce will be used, so every store update will be flushed to driver.                |
+| `onFlushStart`   | `Event<WithPersistentFlushEvent>`                                             | `undefined` | An Event to trigger before flushing to driver. An `id` in payload can be used in all the rest "flush" events to identify the flow when it's needed.                                              |
+| `onFlushDone`    | `Event<WithPersistentFlushEvent>`                                             | `undefined` | An Event to trigger when flush succeeds. An `id` in payload refers to `id` from appropriate `onFlushStart` payload.                                                                              |
+| `onFlushFail`    | `Event<WithPersistentFlushFailEvent>`                                         | `undefined` | An Event to trigger when flush fails. An `id` in payload refers to `id` from appropriate `onFlushStart` payload.                                                                                 |
+| `onFlushFinally` | `Event<WithPersistentFlushEvent>`                                             | `undefined` | An Event to trigger before flushing to driver. This al always triggering after either `onFlushDone` or `onFlushFail`. An `id` in payload refers to `id` from appropriate `onFlushStart` payload. |
+| `readOnly`       | `Store<boolean>`                                                              | `undefined` | A `filter` Store to disable writes to Driver.                                                                                                                                                    |
+| `wakeUp`         | <code>Store&lt;State&gt; &#124; ((state: State) =&gt; void)</code>            | `undefined` | Alternative target which will receive initial state read from driver on initialization. When `undefined`, the source Store will be used.                                                         |
+| `serialize`      | <code>(input: Value) =&gt; Serialized &#124; Promise&lt;Serialized&gt;</code> | `undefined` | Serialization before writing data to driver.                                                                                                                                                     |
+| `unserialize`    | <code>(output: Serialized) =&gt; Value &#124; Promise&lt;Value&gt;</code>     | `undefined` | Unserialization after reading data from driver.                                                                                                                                                  |
