@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 (DEV)
+## 0.3.0 (2022-12-12)
 
 - **BREAKING**: Bump `effector` in `peerDependencies` to `~20.4.0 || >=21` for
   `guard()`.
