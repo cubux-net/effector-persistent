@@ -1,4 +1,4 @@
-import { createEvent, is, Store } from 'effector';
+import { createEvent, guard, is, Store } from 'effector';
 import { addFlush } from './addFlush';
 import { WithPersistentOptions } from '../types';
 
@@ -10,6 +10,7 @@ export function initialize<Driver, Value, Serialized = Value>(
   store: Store<Value>,
   {
     flushDelay,
+    readOnly,
     serialize = noop,
     unserialize = noop,
     wakeUp = store,
@@ -40,19 +41,23 @@ export function initialize<Driver, Value, Serialized = Value>(
       (e) => console.error('Failed to read value from persistent driver', e)
     );
 
-    addFlush(store, flushDelay, (v) => {
-      Promise.resolve(serialize(v)).then(
-        (s) =>
-          write(driver, s).catch((e) =>
-            console.error('Failed to write data to persistent driver', e)
-          ),
-        (e) =>
-          console.error(
-            'Failed to serialize input before write to persistent driver',
-            e
-          )
-      );
-    });
+    addFlush(
+      readOnly ? guard({ source: store, filter: readOnly }) : store,
+      flushDelay,
+      (v) => {
+        Promise.resolve(serialize(v)).then(
+          (s) =>
+            write(driver, s).catch((e) =>
+              console.error('Failed to write data to persistent driver', e)
+            ),
+          (e) =>
+            console.error(
+              'Failed to serialize input before write to persistent driver',
+              e
+            )
+        );
+      }
+    );
   }
 
   if (driver instanceof Promise) {

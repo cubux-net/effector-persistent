@@ -12,6 +12,10 @@ export interface WithPersistentOptions<
    */
   flushDelay?: number;
   /**
+   * Optional flag store to disable writes to storage.
+   */
+  readOnly?: Store<boolean>;
+  /**
    * Alternative target which will receive initial state read from driver on
    * initialization.
    */

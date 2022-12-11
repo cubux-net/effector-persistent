@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 (DEV)
+
+- **BREAKING**: Bump `effector` in `peerDependencies` to `~20.4.0 || >=21` for
+  `guard()`.
+- Add: Option `readOnly` of type `Store<boolean>` to disable writes to storage.
+
 ## 0.2.0 (2022-09-10)
 
 - **BREAKING**: Remove generic type parameter 3 in `withPersistent()` call.
