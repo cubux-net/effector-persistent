@@ -1,6 +1,6 @@
 {
   "name": "@cubux/effector-persistent",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Persist data in effector store.",
   "keywords": [
     "effector",

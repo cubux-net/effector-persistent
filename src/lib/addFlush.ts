@@ -1,8 +1,8 @@
-import { Event, Store } from 'effector';
+import { Event } from 'effector';
 import { flushDelayed } from '../flushDelayed';
 
 export function addFlush<V>(
-  source: Store<V> | Event<V>,
+  source: Event<V>,
   flushDelay: number | undefined,
   flush: (value: V) => void
 ) {

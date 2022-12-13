@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 (2022-12-13)
+
+- **BREAKING**: `withPersistentMap()` now requires the given Driver to be
+  `StoreDriver` rather then `StoreDriverMapped` as before. This is how it should
+  to work, but it wasn't before.
+- Fix: `withPersistentMap()` now tracks changed elements in underlying `Map` and
+  writes to Driver only what was changed. Before this a whole `Map` was sent to
+  overwrite on every update.
+
 ## 0.3.0 (2022-12-12)
 
 - **BREAKING**: Bump `effector` in `peerDependencies` to `~20.4.0 || >=21` for

@@ -68,11 +68,14 @@ inline.
 ```ts
 function withPersistentMap<Key, Value, Serialized = Value>(
   store:    Store<ReadonlyMap<Key, Value>>,
-  driver:   StoreDriverMapped<Key, Serialized>
-          | Promise<StoreDriverMapped<Key, Serialized>>,
+  driver:   StoreDriver<Key, Serialized>
+          | Promise<StoreDriver<Key, Serialized>>,
   options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
 ): typeof store
 ```
+
+Under the hood on every `store` change it will detect changes in underlying
+`Map` entries and will send to `driver` only those was changed.
 
 **Notice:** Serialization when used with `options` will be applied to individual
 values `Value` rather than to whole `Map<Key, Value>`.

@@ -17,14 +17,18 @@ export function withPersistent<Key, Value, Serialized = Value>(
     | StoreDriverSingle<Key, Serialized>
     | Promise<StoreDriverSingle<Key, Serialized>>,
   key: Key,
-  options?: WithPersistentOptions<Value, Value, Serialized>
+  options: WithPersistentOptions<Value, Value, Serialized> = {}
 ): typeof store {
+  const { serialize } = options;
   initialize(
     driver,
     store,
     options,
     (driver) => driver.getItem(key),
-    (driver, value) => driver.setItem(key, value)
+    serialize
+      ? (driver, value) =>
+          Promise.resolve(serialize(value)).then((s) => driver.setItem(key, s))
+      : (driver, value) => driver.setItem(key, value as any as Serialized)
   );
 
   return store;

@@ -1,6 +1,7 @@
 import { Store } from 'effector';
-import { StoreDriverMapped } from '@cubux/storage-driver';
+import { StoreDriver } from '@cubux/storage-driver';
 import { initialize } from './lib/initialize';
+import { noopSerialize } from './lib/noopSerialize';
 import { WithPersistentOptions } from './types';
 
 const containsNoPromises = <T>(
@@ -41,8 +42,8 @@ interface WithPersistentMapFn {
   <Key, Value, Serialized>(
     store: Store<ReadonlyMap<Key, Value>>,
     driver:
-      | StoreDriverMapped<Key, Serialized>
-      | Promise<StoreDriverMapped<Key, Serialized>>,
+      | StoreDriver<Key, Serialized>
+      | Promise<StoreDriver<Key, Serialized>>,
     options: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
   ): typeof store;
 
@@ -55,9 +56,7 @@ interface WithPersistentMapFn {
    */
   <Key, Value>(
     store: Store<ReadonlyMap<Key, Value>>,
-    driver:
-      | StoreDriverMapped<Key, Value>
-      | Promise<StoreDriverMapped<Key, Value>>,
+    driver: StoreDriver<Key, Value> | Promise<StoreDriver<Key, Value>>,
     options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Value>
   ): typeof store;
 }
@@ -75,26 +74,37 @@ export const withPersistentMap: WithPersistentMapFn = <
   Serialized = Value
 >(
   store: Store<ReadonlyMap<Key, Value>>,
-  driver:
-    | StoreDriverMapped<Key, Serialized>
-    | Promise<StoreDriverMapped<Key, Serialized>>,
-  options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
+  driver: StoreDriver<Key, Serialized> | Promise<StoreDriver<Key, Serialized>>,
+  options: WithPersistentOptions<
+    ReadonlyMap<Key, Value>,
+    Value,
+    Serialized
+  > = {}
 ): typeof store => {
-  const { serialize, unserialize } = options || {};
+  const { serialize = noopSerialize, unserialize } = options;
   initialize<
-    StoreDriverMapped<Key, Serialized>,
+    StoreDriver<Key, Serialized>,
     ReadonlyMap<Key, Value>,
     ReadonlyMap<Key, Serialized>
   >(
     driver,
     store,
-    options && {
+    {
       ...options,
-      serialize: buildMapMapper(serialize),
       unserialize: buildMapMapper(unserialize),
     },
     (driver) => driver.getAll(),
-    (driver, value) => driver.setAll(value)
+    (driver, value, prev) =>
+      Promise.all([
+        ...Array.from(value)
+          .filter(([k, v]) => v !== prev.get(k))
+          .map(([k, v]) =>
+            Promise.resolve(serialize(v)).then((s) => driver.setItem(k, s))
+          ),
+        ...Array.from(prev)
+          .filter(([k]) => !value.has(k))
+          .map(([k]) => driver.removeItem(k)),
+      ]).then(() => {})
   );
 
   return store;
