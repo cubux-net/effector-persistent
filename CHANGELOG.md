@@ -1,5 +1,12 @@
 # Changelog
 
+### 0.5.0 (2023-05-23)
+
+- Add: `flushDelayed()` options:
+  - `flushDelay` now can be `Store<number>`;
+  - `filter` - optional `Store<boolean>` to conditionally disable flushes.
+- Doc: `flushDelayed()` was not documented in README.
+
 ## 0.4.0 (2022-12-13)
 
 - **BREAKING**: `withPersistentMap()` now requires the given Driver to be

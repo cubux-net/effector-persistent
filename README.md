@@ -25,6 +25,7 @@ npm i @cubux/effector-persistent
 ## API
 
 See also [`@cubux/storage-driver`](https://github.com/cubux-net/ts-storage-driver).
+It supports `localStorage`/`sessionStorage` and `indexedDB`.
 
 ### `withPersistent()`
 
@@ -139,3 +140,38 @@ interface WithPersistentOptions<
 | `wakeUp`         | <code>Store&lt;State&gt; &#124; ((state: State) =&gt; void)</code>            | `undefined` | Alternative target which will receive initial state read from driver on initialization. When `undefined`, the source Store will be used.                                                         |
 | `serialize`      | <code>(input: Value) =&gt; Serialized &#124; Promise&lt;Serialized&gt;</code> | `undefined` | Serialization before writing data to driver.                                                                                                                                                     |
 | `unserialize`    | <code>(output: Serialized) =&gt; Value &#124; Promise&lt;Value&gt;</code>     | `undefined` | Unserialization after reading data from driver.                                                                                                                                                  |
+
+## Helper API
+
+### `flushDelayed()`
+
+Setup delayed flushes from `source` unit to `target` unit with whe given debounce
+interval.
+
+Prefer [`patronum` `debounce()`](https://patronum.effector.dev/methods/debounce/)
+instead.
+
+```ts
+function flushDelayed<T>(options: Options<T>): (() => void);
+```
+
+It takes options described below and returns a function to stop watching and
+interrupt planned flush.
+
+| Options      | Type                                              | Default      | Description                                                               |
+|--------------|---------------------------------------------------|--------------|---------------------------------------------------------------------------|
+| `source`     | <code>Store&lt;T&gt; &#124; Event&lt;T&gt;</code> | **Required** | Source unit to watch                                                      |
+| `target`     | `(payload: T) => void`                            | **Required** | Receiver to flush data to                                                 |
+| `flushDelay` | <code>number &#124; Store&lt;number&gt;</code>    | `1000`       | Debounce timeout to await before flush                                    |
+| `filter`     | <code>Store&lt;boolean&gt;</code>                 | `undefined`  | When specified, flushes will work only when this filter `Store` is `true` |
+
+Actual flush `target` will be called only after `source` unit will stop
+triggering for at least duration in `flushDelay`. That is while `source` is
+keeping triggering continuous within this duration, flush `target` will never
+be called.
+
+When `flushDelay` is `Store<number>`, it's value will take effect only on next
+`source` update.
+
+When `filter` is used, it will abort current planned flush, when its value
+becomes `false`.

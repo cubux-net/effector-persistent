@@ -1,11 +1,15 @@
 {
   "name": "@cubux/effector-persistent",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Persist data in effector store.",
   "keywords": [
     "effector",
     "store",
-    "persistent"
+    "persist",
+    "persistent",
+    "localStorage",
+    "sessionStorage",
+    "indexedDB"
   ],
   "author": {
     "name": "Vovan-VE",
