@@ -1,4 +1,4 @@
-import { Event, guard, Store } from 'effector';
+import { Event, sample, Store } from 'effector';
 
 interface Options<T> {
   /**
@@ -49,7 +49,7 @@ export function flushDelayed<T>({
     }
   });
   if (filter) {
-    guard({
+    sample({
       source: filter.updates,
       filter: (b) => !b,
     }).watch(() => clearTimeout(tId));

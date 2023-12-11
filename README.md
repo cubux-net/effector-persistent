@@ -35,7 +35,7 @@ returns input `store`, so it can be used inline.
 
 ```ts
 function withPersistent<Key, Value, Serialized = Value>(
-  store:    Store<Value>,
+  store:    StoreWritable<Value>,
   driver:   StoreDriverSingle<Key, Serialized>
           | Promise<StoreDriverSingle<Key, Serialized>>,
   key:      Key,
@@ -68,7 +68,7 @@ inline.
 
 ```ts
 function withPersistentMap<Key, Value, Serialized = Value>(
-  store:    Store<ReadonlyMap<Key, Value>>,
+  store:    StoreWritable<ReadonlyMap<Key, Value>>,
   driver:   StoreDriver<Key, Serialized>
           | Promise<StoreDriver<Key, Serialized>>,
   options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
@@ -132,12 +132,12 @@ interface WithPersistentOptions<
 | Options          | Type                                                                          | Default     | Description                                                                                                                                                                                      |
 |------------------|-------------------------------------------------------------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `flushDelay`     | `number`                                                                      | `undefined` | Debounce subsequent store updates and flush only after latest change. If set to `undefined` (default), no debounce will be used, so every store update will be flushed to driver.                |
-| `onFlushStart`   | `Event<WithPersistentFlushEvent>`                                             | `undefined` | An Event to trigger before flushing to driver. An `id` in payload can be used in all the rest "flush" events to identify the flow when it's needed.                                              |
-| `onFlushDone`    | `Event<WithPersistentFlushEvent>`                                             | `undefined` | An Event to trigger when flush succeeds. An `id` in payload refers to `id` from appropriate `onFlushStart` payload.                                                                              |
-| `onFlushFail`    | `Event<WithPersistentFlushFailEvent>`                                         | `undefined` | An Event to trigger when flush fails. An `id` in payload refers to `id` from appropriate `onFlushStart` payload.                                                                                 |
-| `onFlushFinally` | `Event<WithPersistentFlushEvent>`                                             | `undefined` | An Event to trigger before flushing to driver. This al always triggering after either `onFlushDone` or `onFlushFail`. An `id` in payload refers to `id` from appropriate `onFlushStart` payload. |
-| `readOnly`       | `Store<boolean>`                                                              | `undefined` | A `filter` Store to disable writes to Driver.                                                                                                                                                    |
-| `wakeUp`         | <code>Store&lt;State&gt; &#124; ((state: State) =&gt; void)</code>            | `undefined` | Alternative target which will receive initial state read from driver on initialization. When `undefined`, the source Store will be used.                                                         |
+| `onFlushStart`   | `EventCallable<WithPersistentFlushEvent>`                                     | `undefined` | An Event to trigger before flushing to driver. An `id` in payload can be used in all the rest "flush" events to identify the flow when it's needed.                                              |
+| `onFlushDone`    | `EventCallable<WithPersistentFlushEvent>`                                     | `undefined` | An Event to trigger when flush succeeds. An `id` in payload refers to `id` from appropriate `onFlushStart` payload.                                                                              |
+| `onFlushFail`    | `EventCallable<WithPersistentFlushFailEvent>`                                 | `undefined` | An Event to trigger when flush fails. An `id` in payload refers to `id` from appropriate `onFlushStart` payload.                                                                                 |
+| `onFlushFinally` | `EventCallable<WithPersistentFlushEvent>`                                     | `undefined` | An Event to trigger before flushing to driver. This al always triggering after either `onFlushDone` or `onFlushFail`. An `id` in payload refers to `id` from appropriate `onFlushStart` payload. |
+| `readOnly`       | `EventCallable<boolean>`                                                      | `undefined` | A `filter` Store to disable writes to Driver.                                                                                                                                                    |
+| `wakeUp`         | <code>StoreWritable&lt;State&gt; &#124; ((state: State) =&gt; void)</code>    | `undefined` | Alternative target which will receive initial state read from driver on initialization. When `undefined`, the source StoreWritable will be used.                                                 |
 | `serialize`      | <code>(input: Value) =&gt; Serialized &#124; Promise&lt;Serialized&gt;</code> | `undefined` | Serialization before writing data to driver.                                                                                                                                                     |
 | `unserialize`    | <code>(output: Serialized) =&gt; Value &#124; Promise&lt;Value&gt;</code>     | `undefined` | Unserialization after reading data from driver.                                                                                                                                                  |
 

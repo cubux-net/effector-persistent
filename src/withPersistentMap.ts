@@ -1,4 +1,4 @@
-import { Store } from 'effector';
+import { StoreWritable } from 'effector';
 import { StoreDriver } from '@cubux/storage-driver';
 import { initialize } from './lib/initialize';
 import { noopSerialize } from './lib/noopSerialize';
@@ -40,7 +40,7 @@ interface WithPersistentMapFn {
    * @return Input store
    */
   <Key, Value, Serialized>(
-    store: Store<ReadonlyMap<Key, Value>>,
+    store: StoreWritable<ReadonlyMap<Key, Value>>,
     driver:
       | StoreDriver<Key, Serialized>
       | Promise<StoreDriver<Key, Serialized>>,
@@ -55,7 +55,7 @@ interface WithPersistentMapFn {
    * @return Input store
    */
   <Key, Value>(
-    store: Store<ReadonlyMap<Key, Value>>,
+    store: StoreWritable<ReadonlyMap<Key, Value>>,
     driver: StoreDriver<Key, Value> | Promise<StoreDriver<Key, Value>>,
     options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Value>
   ): typeof store;
@@ -73,7 +73,7 @@ export const withPersistentMap: WithPersistentMapFn = <
   Value,
   Serialized = Value
 >(
-  store: Store<ReadonlyMap<Key, Value>>,
+  store: StoreWritable<ReadonlyMap<Key, Value>>,
   driver: StoreDriver<Key, Serialized> | Promise<StoreDriver<Key, Serialized>>,
   options: WithPersistentOptions<
     ReadonlyMap<Key, Value>,

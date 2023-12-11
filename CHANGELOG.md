@@ -1,6 +1,21 @@
 # Changelog
 
-### 0.5.0 (2023-05-23)
+## 0.6.0 (2023-12-11)
+
+- **BREAKING**: Drop Node < 18.
+- **BREAKING**: Require `effector@^23`. Using `^23` range rather than `>=` as
+  before. Upgrade to new Effector API, dropping previous versions. This cause
+  the following changes:
+  - `WithPersistentFlushEvent`
+    - `onFlushStart`, `onFlushDone`, `onFlushFail` and `onFlushFinally` was
+      changed from `Event` to `EventCallable`.
+    - `wakeUp`: A `Store` case was changed to `StoreWritable`.
+  - Both `withPersistent()` and `withPersistentMap()` changed their 1st argument
+    from `Store` to `StoreWritable`.
+- **BREAKING**: Require `@cubux/storage-driver@^0.4`
+- Add: Allow TypeScript 5 in `peerDependencies`.
+
+## 0.5.0 (2023-05-23)
 
 - Add: `flushDelayed()` options:
   - `flushDelay` now can be `Store<number>`;

@@ -1,4 +1,4 @@
-import { Event, Store } from 'effector';
+import { EventCallable, Store, StoreWritable } from 'effector';
 
 export interface WithPersistentFlushEvent {
   /** Identifier for current flush flow */
@@ -24,23 +24,23 @@ export interface WithPersistentOptions<
    * An Event to trigger before flushing to driver. An `id` in payload can be
    * used in all the rest "flush" events to identify the flow when it's needed.
    */
-  onFlushStart?: Event<WithPersistentFlushEvent>;
+  onFlushStart?: EventCallable<WithPersistentFlushEvent>;
   /**
    * An Event to trigger when flush succeeds. An `id` in payload refers to `id`
    * from appropriate `onFlushStart` payload.
    */
-  onFlushDone?: Event<WithPersistentFlushEvent>;
+  onFlushDone?: EventCallable<WithPersistentFlushEvent>;
   /**
    * An Event to trigger when flush fails. An `id` in payload refers to `id`
    * from appropriate `onFlushStart` payload.
    */
-  onFlushFail?: Event<WithPersistentFlushFailEvent>;
+  onFlushFail?: EventCallable<WithPersistentFlushFailEvent>;
   /**
    * An Event to trigger before flushing to driver. This al always triggering
    * after either `onFlushDone` or `onFlushFail`. An `id` in payload refers to
    * `id` from appropriate `onFlushStart` payload.
    */
-  onFlushFinally?: Event<WithPersistentFlushEvent>;
+  onFlushFinally?: EventCallable<WithPersistentFlushEvent>;
   /**
    * A `filter` Store to disable writes to Driver.
    */
@@ -49,7 +49,7 @@ export interface WithPersistentOptions<
    * Alternative target which will receive initial state read from driver on
    * initialization.
    */
-  wakeUp?: Store<State> | ((state: State) => void);
+  wakeUp?: StoreWritable<State> | ((state: State) => void);
   /**
    * Serialization before writing data to driver.
    */

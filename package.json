@@ -1,6 +1,6 @@
 {
   "name": "@cubux/effector-persistent",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Persist data in effector store.",
   "keywords": [
     "effector",
@@ -33,7 +33,7 @@
     "README.md"
   ],
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "scripts": {
     "build": "dts build",
@@ -47,9 +47,9 @@
     "size": "size-limit"
   },
   "peerDependencies": {
-    "@cubux/storage-driver": "^0.1 || ^0.2 || ^0.3",
-    "effector": "~20.4.0 || >=21",
-    "typescript": "^4"
+    "@cubux/storage-driver": "^0.2 || ^0.3 || ^0.4",
+    "effector": "^23",
+    "typescript": "^4 || ^5"
   },
   "peerDependenciesMeta": {
     "typescript": {
@@ -57,16 +57,16 @@
     }
   },
   "devDependencies": {
-    "@cubux/storage-driver": "^0.1.0",
-    "@size-limit/preset-small-lib": "^8.0.0",
-    "@tsconfig/recommended": "^1.0.1",
-    "dts-cli": "^1.6.0",
-    "effector": "~20.4.0",
+    "@cubux/storage-driver": "^0.4.0",
+    "@size-limit/preset-small-lib": "^11.0.0",
+    "@tsconfig/recommended": "^1.0.3",
+    "dts-cli": "^2.0.3",
+    "effector": "~23.0.0",
     "husky": "^8.0.1",
-    "lint-staged": "^13.0.3",
-    "size-limit": "^8.0.0",
-    "tslib": "^2.4.0",
-    "typescript": "~4.0"
+    "lint-staged": "^15.2.0",
+    "size-limit": "^11.0.0",
+    "tslib": "^2.6.2",
+    "typescript": "~5.0"
   },
   "jest": {
     "testEnvironment": "node"

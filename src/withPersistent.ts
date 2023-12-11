@@ -1,4 +1,4 @@
-import { Store } from 'effector';
+import { StoreWritable } from 'effector';
 import { StoreDriverSingle } from '@cubux/storage-driver';
 import { initialize } from './lib/initialize';
 import { WithPersistentOptions } from './types';
@@ -12,7 +12,7 @@ import { WithPersistentOptions } from './types';
  * @return Input store
  */
 export function withPersistent<Key, Value, Serialized = Value>(
-  store: Store<Value>,
+  store: StoreWritable<Value>,
   driver:
     | StoreDriverSingle<Key, Serialized>
     | Promise<StoreDriverSingle<Key, Serialized>>,

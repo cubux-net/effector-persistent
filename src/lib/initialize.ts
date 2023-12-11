@@ -1,23 +1,23 @@
 import {
   createEvent,
   createStore,
-  Event,
-  guard,
+  EventCallable,
   is,
   merge,
   sample,
   Store,
+  StoreWritable,
 } from 'effector';
 import { WithPersistentOptions } from '../types';
 import { addFlush } from './addFlush';
 import { noopSerialize } from './noopSerialize';
 
-const isStore = <S, U>(unit: Store<S> | U): unit is Store<S> => is.store(unit);
+const isStore = is.store;
 
 function initWakeUp<Driver, Value, Serialized>(
   driver: Driver,
   unserialize: (output: Serialized) => Promise<Value> | Value,
-  wakeUp: Store<Value> | ((state: Value) => void),
+  wakeUp: StoreWritable<Value> | ((state: Value) => void),
   read: (driver: Driver) => Promise<Serialized | undefined>
 ) {
   const setWakingUp = createEvent<boolean>();
@@ -54,7 +54,7 @@ function initWakeUp<Driver, Value, Serialized>(
   return $isWritable;
 }
 
-const safeFire = <V>(event: Event<V> | undefined, payload: V) => {
+const safeFire = <V>(event: EventCallable<V> | undefined, payload: V) => {
   if (event) {
     try {
       event(payload);
@@ -73,18 +73,16 @@ function initFlush<Value>(
   const $prev = createStore(store.defaultState).on(setPrev, (_, p) => p);
 
   const didUpdate = readOnly
-    ? guard({
+    ? sample({
         source: store.updates,
         filter: readOnly.map((ro) => !ro),
       })
     : store.updates;
 
-  const toWrite = guard({
-    source: sample({
-      clock: didUpdate,
-      source: $prev,
-      fn: (prev, next) => ({ next, prev }),
-    }),
+  const toWrite = sample({
+    clock: didUpdate,
+    source: $prev,
+    fn: (prev, next) => ({ next, prev }),
     filter: isWritable,
   });
 
@@ -92,7 +90,7 @@ function initFlush<Value>(
     ? merge([
         didUpdate,
         sample({
-          clock: guard({
+          clock: sample({
             source: readOnly,
             filter: (ro) => !ro,
           }),
@@ -107,7 +105,7 @@ function initFlush<Value>(
 
 export function initialize<Driver, Value, Serialized = Value>(
   driver: Driver | Promise<Driver>,
-  store: Store<Value>,
+  store: StoreWritable<Value>,
   {
     flushDelay,
     onFlushStart,
