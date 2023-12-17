@@ -1,8 +1,14 @@
-import { StoreWritable } from 'effector';
+import { NoInfer, Store, StoreWritable } from 'effector';
 import { StoreDriver } from '@cubux/storage-driver';
+import {
+  CommonOptions,
+  WithoutSerialization,
+  WithoutWakeUp,
+  WithSerialization,
+  WithWakeUp,
+} from './internal';
 import { initialize } from './lib/initialize';
 import { noopSerialize } from './lib/noopSerialize';
-import { WithPersistentOptions } from './types';
 
 const containsNoPromises = <T>(
   array: readonly (T | Promise<T>)[]
@@ -24,6 +30,17 @@ const buildMapMapper = <V, U>(mapper?: (value: V) => U | Promise<U>) =>
       : Promise.all(items).then((items) => new Map(items));
   });
 
+type DriverArg<K, V> =
+  | StoreDriver<NoInfer<K>, NoInfer<V>>
+  | Promise<StoreDriver<NoInfer<K>, NoInfer<V>>>;
+
+// writable | wakeUp | serialize
+//          | wakeUp | serialize
+// writable | wakeUp |
+//          | wakeUp |
+// writable |        | serialize
+// writable |        |
+
 /**
  * Register persistent data handling for the given store with the given driver.
  * @param store Store to work with
@@ -39,12 +56,27 @@ interface WithPersistentMapFn {
    * @param options Other options
    * @return Input store
    */
-  <Key, Value, Serialized>(
+  <Key, Value, Serialized = Value>(
     store: StoreWritable<ReadonlyMap<Key, Value>>,
-    driver:
-      | StoreDriver<Key, Serialized>
-      | Promise<StoreDriver<Key, Serialized>>,
-    options: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
+    driver: DriverArg<Key, Serialized>,
+    options: CommonOptions<ReadonlyMap<Key, Value>, Value, Serialized> &
+      WithSerialization<Value, Serialized> &
+      WithWakeUp<ReadonlyMap<Key, Value>>
+  ): typeof store;
+
+  /**
+   * Register persistent data handling for the given store with the given driver.
+   * @param store Store to work with
+   * @param driver Persistent storage driver
+   * @param options Other options
+   * @return Input store
+   */
+  <Key, Value, Serialized = Value>(
+    store: Store<ReadonlyMap<Key, Value>>,
+    driver: DriverArg<Key, Serialized>,
+    options: CommonOptions<ReadonlyMap<Key, Value>, Value, Serialized> &
+      WithSerialization<Value, Serialized> &
+      WithWakeUp<ReadonlyMap<Key, Value>>
   ): typeof store;
 
   /**
@@ -56,8 +88,55 @@ interface WithPersistentMapFn {
    */
   <Key, Value>(
     store: StoreWritable<ReadonlyMap<Key, Value>>,
-    driver: StoreDriver<Key, Value> | Promise<StoreDriver<Key, Value>>,
-    options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Value>
+    driver: DriverArg<Key, Value>,
+    options: CommonOptions<ReadonlyMap<Key, Value>, Value, Value> &
+      WithoutSerialization<Value> &
+      WithWakeUp<ReadonlyMap<Key, Value>>
+  ): typeof store;
+
+  /**
+   * Register persistent data handling for the given store with the given driver.
+   * @param store Store to work with
+   * @param driver Persistent storage driver
+   * @param options Other options
+   * @return Input store
+   */
+  <Key, Value>(
+    store: Store<ReadonlyMap<Key, Value>>,
+    driver: DriverArg<Key, Value>,
+    options: CommonOptions<ReadonlyMap<Key, Value>, Value, Value> &
+      WithoutSerialization<Value> &
+      WithWakeUp<ReadonlyMap<Key, Value>>
+  ): typeof store;
+
+  /**
+   * Register persistent data handling for the given store with the given driver.
+   * @param store Store to work with
+   * @param driver Persistent storage driver
+   * @param options Other options
+   * @return Input store
+   */
+  <Key, Value, Serialized = Value>(
+    store: StoreWritable<ReadonlyMap<Key, Value>>,
+    driver: DriverArg<Key, Serialized>,
+    options: CommonOptions<ReadonlyMap<Key, Value>, Value, Serialized> &
+      WithSerialization<Value, Serialized> &
+      WithoutWakeUp
+  ): typeof store;
+
+  /**
+   * Register persistent data handling for the given store with the given driver.
+   * @param store Store to work with
+   * @param driver Persistent storage driver
+   * @param options Other options
+   * @return Input store
+   */
+  <Key, Value>(
+    store: StoreWritable<ReadonlyMap<Key, Value>>,
+    driver: DriverArg<Key, Value>,
+    options?: CommonOptions<ReadonlyMap<Key, Value>, Value, Value> &
+      WithoutSerialization<Value> &
+      WithoutWakeUp
   ): typeof store;
 }
 
@@ -68,19 +147,13 @@ interface WithPersistentMapFn {
  * @param options Other options
  * @return Input store
  */
-export const withPersistentMap: WithPersistentMapFn = <
-  Key,
-  Value,
-  Serialized = Value
->(
+function withPersistentMapFn<Key, Value, Serialized = Value>(
   store: StoreWritable<ReadonlyMap<Key, Value>>,
-  driver: StoreDriver<Key, Serialized> | Promise<StoreDriver<Key, Serialized>>,
-  options: WithPersistentOptions<
-    ReadonlyMap<Key, Value>,
-    Value,
-    Serialized
-  > = {}
-): typeof store => {
+  driver: DriverArg<Key, Serialized>,
+  options: CommonOptions<ReadonlyMap<Key, Value>, Value, Serialized> &
+    Partial<WithSerialization<Value, Serialized>> &
+    Partial<WithWakeUp<ReadonlyMap<Key, Value>>> = {}
+): typeof store {
   const { serialize = noopSerialize, unserialize } = options;
   initialize<
     StoreDriver<Key, Serialized>,
@@ -108,4 +181,13 @@ export const withPersistentMap: WithPersistentMapFn = <
   );
 
   return store;
-};
+}
+
+/**
+ * Register persistent data handling for the given store with the given driver.
+ * @param store Store to work with
+ * @param driver Persistent storage driver
+ * @param options Other options
+ * @return Input store
+ */
+export const withPersistentMap = withPersistentMapFn as WithPersistentMapFn;

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0 (2023-12-17)
+
+- Fix: Both `withPersistent()` and `withPersistentMap()`, when `wakeUp` options
+  is defined, not allow a `Store` rather then `StoreWritable`.
+
 ## 0.6.0 (2023-12-11)
 
 - **BREAKING**: Drop Node < 18.

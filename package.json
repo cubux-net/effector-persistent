@@ -1,6 +1,6 @@
 {
   "name": "@cubux/effector-persistent",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Persist data in effector store.",
   "keywords": [
     "effector",
@@ -47,7 +47,7 @@
     "size": "size-limit"
   },
   "peerDependencies": {
-    "@cubux/storage-driver": "^0.2 || ^0.3 || ^0.4",
+    "@cubux/storage-driver": "^0.4 || ^0.5",
     "effector": "^23",
     "typescript": "^4 || ^5"
   },
@@ -57,7 +57,7 @@
     }
   },
   "devDependencies": {
-    "@cubux/storage-driver": "^0.4.0",
+    "@cubux/storage-driver": "^0.5.0",
     "@size-limit/preset-small-lib": "^11.0.0",
     "@tsconfig/recommended": "^1.0.3",
     "dts-cli": "^2.0.3",

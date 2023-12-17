@@ -33,9 +33,13 @@ Register persistent data handling for the given store with the given driver.
 Data from `store` will be stored in `driver` with the given `key`. Function
 returns input `store`, so it can be used inline.
 
+Type of `store` can be `Store` only when `wakeUp` options is defined. Otherwise
+a `StoreWritable` is needed.
+
 ```ts
 function withPersistent<Key, Value, Serialized = Value>(
-  store:    StoreWritable<Value>,
+  store:    Store<Value>
+          | StoreWritable<Value>,
   driver:   StoreDriverSingle<Key, Serialized>
           | Promise<StoreDriverSingle<Key, Serialized>>,
   key:      Key,
@@ -66,9 +70,13 @@ given driver. Data from `store` will be stored in `driver` with corresponding
 keys from `ReadonlyMap`. Function returns input `store`, so it can be used
 inline.
 
+Type of `store` can be `Store` only when `wakeUp` options is defined. Otherwise
+a `StoreWritable` is needed.
+
 ```ts
 function withPersistentMap<Key, Value, Serialized = Value>(
-  store:    StoreWritable<ReadonlyMap<Key, Value>>,
+  store:    Store<ReadonlyMap<Key, Value>>
+          | StoreWritable<ReadonlyMap<Key, Value>>,
   driver:   StoreDriver<Key, Serialized>
           | Promise<StoreDriver<Key, Serialized>>,
   options?: WithPersistentOptions<ReadonlyMap<Key, Value>, Value, Serialized>
