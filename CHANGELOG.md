@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0 (2024-07-22)
+
+- Add: `onBeforeWakeUp` and `onAfterWakeUp` callback options.
+
 ## 0.7.0 (2023-12-17)
 
 - Fix: Both `withPersistent()` and `withPersistentMap()`, when `wakeUp` options

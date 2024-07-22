@@ -14,40 +14,54 @@ import { noopSerialize } from './noopSerialize';
 
 const isStore = is.store;
 
-function initWakeUp<Driver, Value, Serialized>(
-  driver: Driver,
-  unserialize: (output: Serialized) => Promise<Value> | Value,
-  wakeUp: StoreWritable<Value> | ((state: Value) => void),
-  read: (driver: Driver) => Promise<Serialized | undefined>
-) {
+function initWakeUp<Driver, Value, Serialized>({
+  driver,
+  read,
+  unserialize,
+  wakeUp,
+  onBeforeWakeUp,
+  onAfterWakeUp,
+}: {
+  driver: Driver;
+  read: (driver: Driver) => Promise<Serialized | undefined>;
+  unserialize: (output: Serialized) => Promise<Value> | Value;
+  wakeUp: StoreWritable<Value> | ((state: Value) => void);
+  onBeforeWakeUp?: () => void;
+  onAfterWakeUp?: () => void;
+}) {
   const setWakingUp = createEvent<boolean>();
   const $isWritable = createStore(true).on(setWakingUp, (_, b) => !b);
 
   read(driver).then(
     (s) => {
-      if (s !== undefined) {
-        return Promise.resolve(unserialize(s)).then(
-          (v) => {
-            setWakingUp(true);
-            try {
-              if (isStore(wakeUp)) {
-                const init = createEvent<Value>();
-                wakeUp.on(init, (_, v) => v);
-                init(v);
-              } else {
-                wakeUp(v);
-              }
-            } finally {
-              setWakingUp(false);
-            }
-          },
-          (e) =>
-            console.error(
-              'Failed to unserialize output from persistent driver',
-              e
-            )
-        );
+      if (s === undefined) {
+        onBeforeWakeUp?.();
+        onAfterWakeUp?.();
+        return;
       }
+      return Promise.resolve(unserialize(s)).then(
+        (v) => {
+          onBeforeWakeUp?.();
+          setWakingUp(true);
+          try {
+            if (isStore(wakeUp)) {
+              const init = createEvent<Value>();
+              wakeUp.on(init, (_, v) => v);
+              init(v);
+            } else {
+              wakeUp(v);
+            }
+          } finally {
+            setWakingUp(false);
+            onAfterWakeUp?.();
+          }
+        },
+        (e) =>
+          console.error(
+            'Failed to unserialize output from persistent driver',
+            e
+          )
+      );
     },
     (e) => console.error('Failed to read value from persistent driver', e)
   );
@@ -115,13 +129,26 @@ export function initialize<Driver, Value, Serialized = Value>(
     readOnly,
     unserialize = noopSerialize,
     wakeUp = store,
+    onBeforeWakeUp,
+    onAfterWakeUp,
   }: Omit<WithPersistentOptions<Value, Value, Serialized>, 'serialize'>,
   read: (driver: Driver) => Promise<Serialized | undefined>,
   write: (driver: Driver, value: Value, prev: Value) => Promise<void>
 ) {
   function setup(driver: Driver) {
     addFlush(
-      initFlush(store, readOnly, initWakeUp(driver, unserialize, wakeUp, read)),
+      initFlush(
+        store,
+        readOnly,
+        initWakeUp({
+          driver,
+          read,
+          unserialize,
+          wakeUp,
+          onBeforeWakeUp,
+          onAfterWakeUp,
+        })
+      ),
       flushDelay,
       ({ next, prev }) => {
         const id = Symbol();

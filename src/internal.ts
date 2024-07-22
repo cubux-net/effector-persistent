@@ -60,6 +60,14 @@ export interface CommonOptions<State = any, Value = State, Serialized = Value> {
    * A `filter` Store to disable writes to Driver.
    */
   readOnly?: Store<boolean>;
+  /**
+   * A callback to call before the "wake up" procedure.
+   */
+  onBeforeWakeUp?: () => void;
+  /**
+   * A callback to call after the "wake up" procedure.
+   */
+  onAfterWakeUp?: () => void;
 }
 
 export interface OptionsWithWakeUp<
