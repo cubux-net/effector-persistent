@@ -1,6 +1,6 @@
 {
   "name": "@cubux/effector-persistent",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Persist data in effector store.",
   "keywords": [
     "effector",
@@ -25,7 +25,7 @@
   },
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
-  "module": "dist/effector-persistent.esm.js",
+  "module": "dist/index.mjs",
   "files": [
     "dist",
     "CHANGELOG.md",
@@ -33,23 +33,20 @@
     "README.md"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=24"
   },
   "scripts": {
-    "build": "dts build",
-    "start": "dts watch",
-    "prepare": "dts build",
-    "test": "tsc --noEmit && dts test --passWithNoTests",
-    "test:watch": "npm test -- --watch",
-    "test:coverage": "npm test -- --coverage",
-    "analyze": "size-limit --why",
-    "lint": "dts lint",
-    "size": "size-limit"
+    "build": "tsup",
+    "start": "tsup --watch src",
+    "prepare": "npm run build",
+    "test": "tsc --noEmit && vitest --run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:coverage": "npm test -- --coverage"
   },
   "peerDependencies": {
-    "@cubux/storage-driver": "^0.4 || ^0.5",
+    "@cubux/storage-driver": "^0.4 || ^0.5 || ^0.6",
     "effector": "^23",
-    "typescript": "^4 || ^5"
+    "typescript": "^4 || ^5 || ^6 || ^7"
   },
   "peerDependenciesMeta": {
     "typescript": {
@@ -57,19 +54,13 @@
     }
   },
   "devDependencies": {
-    "@cubux/storage-driver": "^0.5.0",
-    "@size-limit/preset-small-lib": "^11.1.4",
-    "@tsconfig/recommended": "^1.0.7",
-    "dts-cli": "^2.0.5",
-    "effector": "~23.0.0",
+    "@microsoft/api-extractor": "^7.58.12",
     "husky": "^8.0.1",
-    "lint-staged": "^15.2.7",
-    "size-limit": "^11.1.4",
-    "tslib": "^2.6.3",
-    "typescript": "~5.0"
-  },
-  "jest": {
-    "testEnvironment": "node"
+    "lint-staged": "^15.2.0",
+    "prettier": "3.9.6",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json}": [
@@ -81,15 +72,5 @@
     "semi": true,
     "singleQuote": true,
     "trailingComma": "es5"
-  },
-  "size-limit": [
-    {
-      "path": "dist/effector-persistent.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/effector-persistent.esm.js",
-      "limit": "10 KB"
-    }
-  ]
+  }
 }

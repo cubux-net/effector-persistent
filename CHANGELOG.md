@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.0 (2026-08-14)
+
+- **BREAKING**: Require Node >= 24.
+- Allow TypeScript 6/7.
+
 ## 0.8.0 (2024-07-22)
 
 - Add: `onBeforeWakeUp` and `onAfterWakeUp` callback options.
